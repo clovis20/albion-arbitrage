@@ -24,13 +24,6 @@ const Arbitrage: React.FC = () => {
   const [opportunities, setOpportunities] = useState<ArbitrageOpportunity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [filters, setFilters] = useState({
-    minProfit: "",
-    minProfitPercentage: "",
-    itemName: "",
-    buyCity: "",
-    sellCity: "",
-  })
 
   useEffect(() => {
     fetchOpportunities()
