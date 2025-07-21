@@ -108,6 +108,8 @@ const ManualArbitrage: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.response?.data?.error || "Erro ao simular arbitragem manual")
+      setScenarios([])
+      setGrouped([])
     } finally {
       setLoading(false)
     }
