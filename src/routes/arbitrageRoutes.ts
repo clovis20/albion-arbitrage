@@ -40,6 +40,7 @@ export default function createArbitrageRoutes(
       const opportunities = await db.getTopArbitrageOpportunities(limit)
       return res.json({ opportunities })
     } catch (error) {
+      console.error("Erro detalhado /api/arbitrage/top:", error) // Log detalhado do erro
       return res.status(500).json({ error: "Internal server error" })
     }
   })
