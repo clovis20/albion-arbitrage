@@ -16,7 +16,6 @@ import {
   CardContent,
   Chip,
 } from "@mui/material"
-import { TrendingUp, FilterList } from "@mui/icons-material"
 import { arbitrageApi, ArbitrageOpportunity } from "../services/api"
 import coinImg from "../images/coin.png"
 

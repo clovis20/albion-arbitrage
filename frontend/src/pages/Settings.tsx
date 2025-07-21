@@ -30,7 +30,7 @@ interface SystemStatus {
 }
 
 const Settings: React.FC = () => {
-  const [systemStatus, setSystemStatus] = useState<SystemStatus>({
+  const [systemStatus] = useState<SystemStatus>({
     backend: "connected",
     database: "connected",
     redis: "connected",
