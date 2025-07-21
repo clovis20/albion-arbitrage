@@ -10,8 +10,9 @@ Sistema completo de cálculo de arbitragem para Albion Online, com backend Node.
 - **Express** - Framework web
 - **PostgreSQL** - Banco de dados principal
 - **Redis** - Cache em tempo real
-- **NATS** - Sistema de mensageria para dados do Albion
 - **Socket.io** - Comunicação em tempo real
+- **node-cron** - Tarefas periódicas
+- **Integração REST com Albion Data Project**
 
 ### Frontend
 
@@ -21,13 +22,13 @@ Sistema completo de cálculo de arbitragem para Albion Online, com backend Node.
 - **React Router** - Navegação
 - **Axios** - Cliente HTTP
 - **Recharts** - Gráficos
+- **Socket.io-client** - Dados em tempo real
 
 ## 📋 Pré-requisitos
 
 - Node.js 18+
 - PostgreSQL 12+
 - Redis 6+
-- NATS Server (opcional)
 
 ## 🛠️ Instalação
 
@@ -66,7 +67,7 @@ CREATE DATABASE albion_arbitrage;
 -- Conecte ao banco criado
 \c albion_arbitrage
 
--- Execute os scripts SQL (veja pasta sql/)
+-- Execute os scripts SQL (veja arquivos .sql na raiz)
 ```
 
 #### Redis
@@ -90,9 +91,6 @@ DB_PASSWORD=sua_senha
 
 # Redis
 REDIS_URL=redis://localhost:6380
-
-# NATS
-NATS_SERVERS=nats://localhost:4222
 
 # Server
 PORT=5000
@@ -150,23 +148,16 @@ novo-site-precos/
 │   ├── services/              # Serviços
 │   │   ├── arbitrage_service.ts
 │   │   ├── database_service.ts
-│   │   ├── nats_service.ts
-│   │   └── redis_service.ts
+│   │   ├── redis_service.ts
 │   └── utils/
 │       └── logger.ts
 ├── frontend/
 │   ├── src/
 │   │   ├── components/        # Componentes React
-│   │   │   └── Header.tsx
-│   │   ├── pages/            # Páginas da aplicação
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Arbitrage.tsx
-│   │   │   ├── Market.tsx
-│   │   │   └── Settings.tsx
-│   │   ├── services/         # Serviços de API
-│   │   │   └── api.ts
-│   │   ├── App.tsx           # Componente principal
-│   │   └── main.tsx          # Entry point
+│   │   ├── pages/             # Páginas da aplicação
+│   │   ├── services/          # Serviços de API
+│   │   ├── App.tsx            # Componente principal
+│   │   └── main.tsx           # Entry point
 │   ├── package.json
 │   └── vite.config.ts
 ├── package.json
@@ -187,6 +178,7 @@ novo-site-precos/
 - `GET /api/arbitrage/top` - Top oportunidades
 - `GET /api/arbitrage/filtered` - Oportunidades filtradas
 - `GET /api/arbitrage/filters-info` - Informações de filtros
+- `POST /api/arbitrage/manual-simulate` - Simulação manual de arbitragem (informe cidade_compra, cidade_venda, item_base e veja todos os cenários possíveis de conversão, incluindo lucros negativos)
 
 ## 🎯 Funcionalidades
 
@@ -200,8 +192,9 @@ novo-site-precos/
 
 - Lista de oportunidades de arbitragem
 - Filtros avançados
-- Cálculo de lucro
+- Cálculo de lucro (incluindo taxa de venda de 4%)
 - Tabela responsiva
+- Simulação manual de arbitragem (T5→2xT3, T7→2xT5, T7→4xT3)
 
 ### Mercado
 
@@ -216,67 +209,16 @@ novo-site-precos/
 - Informações da aplicação
 - Configurações de desenvolvimento
 
-## 🔧 Configuração Avançada
+## 🔧 Detalhes Técnicos
 
-### NATS (Dados em Tempo Real)
-
-Para receber dados em tempo real do Albion Data Project:
-
-1. Instale o NATS Server
-2. Configure as credenciais no `.env`
-3. O sistema automaticamente se conectará e processará os dados
-
-### Banco de Dados
-
-O sistema usa PostgreSQL para:
-
-- Armazenar ingredientes e cidades
-- Registrar preços de mercado
-- Calcular oportunidades de arbitragem
-- Manter histórico de preços
-
-### Cache Redis
-
-O Redis é usado para:
-
-- Cache de dados frequentes
-- Sessões de usuário
-- Dados em tempo real
-
-## 🐛 Troubleshooting
-
-### Erro de conexão com PostgreSQL
-
-```bash
-# Verifique se o PostgreSQL está rodando
-pg_ctl status
-
-# Verifique as credenciais no .env
-# Teste a conexão
-psql -h localhost -U postgres -d albion_arbitrage
-```
-
-### Erro de conexão com Redis
-
-```bash
-# Verifique se o Redis está rodando na porta 6380
-redis-cli -p 6380 ping
-
-# Se não estiver, inicie:
-redis-server --port 6380
-```
-
-### Erro de NATS
-
-O sistema funciona sem NATS, mas sem dados em tempo real. Para resolver:
-
-1. Instale NATS Server
-2. Configure as credenciais
-3. Verifique a conectividade
+- **Integração com Albion Data Project:** O backend faz polling periódico via REST API para buscar preços de mercado em tempo real.
+- **Cálculo de Arbitragem:** Considera mecânicas do jogo (ex: T5→2xT3, T7→2xT5, T7→4xT3), taxa de venda de 4%, e mostra oportunidades inclusive negativas.
+- **Cache Redis:** Usado para acelerar respostas e reduzir consultas ao banco.
+- **Socket.io:** Atualizações em tempo real para o frontend.
 
 ## 📝 Scripts SQL
 
-Execute estes scripts no PostgreSQL para criar as tabelas:
+Execute estes scripts no PostgreSQL para criar as tabelas (veja também os arquivos .sql na raiz):
 
 ```sql
 -- Tabela de ingredientes
@@ -310,14 +252,16 @@ CREATE TABLE market_prices (
 -- Tabela de oportunidades de arbitragem
 CREATE TABLE arbitrage_opportunities (
     id SERIAL PRIMARY KEY,
-    item_name VARCHAR(255) NOT NULL,
-    buy_city VARCHAR(255) NOT NULL,
-    sell_city VARCHAR(255) NOT NULL,
+    source_ingredient_id VARCHAR(255) NOT NULL,
+    target_ingredient_id VARCHAR(255) NOT NULL,
+    buy_city_id INTEGER NOT NULL,
+    sell_city_id INTEGER NOT NULL,
     buy_price INTEGER NOT NULL,
     sell_price INTEGER NOT NULL,
-    profit INTEGER NOT NULL,
-    profit_percentage DECIMAL(5,2) NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    quantity_multiplier INTEGER NOT NULL,
+    net_profit INTEGER NOT NULL,
+    profit_margin DECIMAL(5,2) NOT NULL,
+    calculated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabela de histórico de preços
@@ -359,6 +303,7 @@ Este projeto é uma ferramenta para jogadores de Albion Online que desejam:
 - Identificar oportunidades de arbitragem
 - Monitorar preços de mercado
 - Analisar tendências de preços
+- Simular manualmente cenários de conversão de itens
 - Maximizar lucros no mercado
 
 **Nota:** Este é um projeto educacional e não está afiliado oficialmente ao Albion Online.
