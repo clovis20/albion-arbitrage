@@ -10,7 +10,7 @@ import {
   Paper,
 } from "@mui/material"
 import { TrendingUp, Store, AttachMoney, Speed } from "@mui/icons-material"
-import { arbitrageApi, marketApi } from "../services/api"
+import { arbitrageApi } from "../services/api"
 
 interface DashboardStats {
   totalOpportunities: number

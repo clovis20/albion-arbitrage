@@ -1,4 +1,3 @@
-import React from "react"
 import { Routes, Route } from "react-router-dom"
 import { Box, Container } from "@mui/material"
 import Header from "./components/Header"

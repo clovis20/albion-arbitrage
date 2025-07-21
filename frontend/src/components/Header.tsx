@@ -1,14 +1,6 @@
 import React from "react"
 import { Link as RouterLink, useLocation } from "react-router-dom"
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  IconButton,
-  useTheme,
-} from "@mui/material"
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material"
 import {
   Dashboard as DashboardIcon,
   TrendingUp as ArbitrageIcon,
@@ -17,7 +9,6 @@ import {
 } from "@mui/icons-material"
 
 const Header: React.FC = () => {
-  const theme = useTheme()
   const location = useLocation()
 
   const navItems = [

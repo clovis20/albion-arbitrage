@@ -11,8 +11,6 @@ import {
   TableRow,
   CircularProgress,
   Alert,
-  TextField,
-  Button,
   Grid,
   Card,
   CardContent,
@@ -57,35 +55,6 @@ const Arbitrage: React.FC = () => {
     }
   }
 
-  const handleFilterChange = (field: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleApplyFilters = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const params: any = {}
-      if (filters.minProfit) params.min_profit = parseInt(filters.minProfit)
-      if (filters.minProfitPercentage)
-        params.min_profit_percentage = parseFloat(filters.minProfitPercentage)
-      if (filters.itemName) params.item_name = filters.itemName
-      if (filters.buyCity) params.buy_city = filters.buyCity
-      if (filters.sellCity) params.sell_city = filters.sellCity
-
-      const response = await arbitrageApi.getFilteredOpportunities(params)
-      // Verificar se a resposta tem a estrutura esperada
-      const opportunities = response.data.opportunities || response.data || []
-      setOpportunities(opportunities)
-    } catch (err) {
-      setError("Erro ao aplicar filtros")
-      console.error("Filter error:", err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const formatPrice = (price: number | undefined | null | string) => {
     if (price === undefined || price === null) return "N/A"
     const numPrice = typeof price === "string" ? parseFloat(price) : price
@@ -99,15 +68,6 @@ const Arbitrage: React.FC = () => {
       typeof percentage === "string" ? parseFloat(percentage) : percentage
     if (isNaN(numPercentage)) return "N/A"
     return `${numPercentage.toFixed(2)}%`
-  }
-
-  const getProfitColor = (profit: number | undefined | null | string) => {
-    if (profit === undefined || profit === null) return "error"
-    const numProfit = typeof profit === "string" ? parseFloat(profit) : profit
-    if (isNaN(numProfit)) return "error"
-    if (numProfit > 1000) return "success"
-    if (numProfit > 500) return "warning"
-    return "error"
   }
 
   // Filtrar oportunidades com lucro positivo
