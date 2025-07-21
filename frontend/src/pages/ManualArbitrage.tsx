@@ -5,7 +5,6 @@ import {
   Paper,
   Grid,
   TextField,
-  Button,
   MenuItem,
   Table,
   TableBody,
@@ -21,8 +20,6 @@ import { marketApi } from "../services/api"
 import axios from "axios"
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"
 import coinImg from "../images/coin.png"
-import { useMemo } from "react"
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz"
 import ClearIcon from "@mui/icons-material/Clear"
 
 interface Scenario {
@@ -129,7 +126,7 @@ const ManualArbitrage: React.FC = () => {
     const buyQty = quantities[idx] ?? s.buy_qty
     const sellMultiplier = s.sell_qty / s.buy_qty
     const totalBuy = (s.buy_price ?? 0) * buyQty
-    const totalSell = (s.unit_sell_price ?? 0) * buyQty * sellMultiplier
+    const totalSell = (s.sell_price ?? 0) * buyQty * sellMultiplier
     const SALES_TAX = 0.04
     const netRevenue = totalSell * (1 - SALES_TAX)
     const netProfit = netRevenue - totalBuy
@@ -138,7 +135,7 @@ const ManualArbitrage: React.FC = () => {
       ...s,
       buy_qty: buyQty,
       total_buy: totalBuy,
-      total_sell_price: (s.unit_sell_price ?? 0) * buyQty * sellMultiplier,
+      total_sell_price: (s.sell_price ?? 0) * buyQty * sellMultiplier,
       sell_qty: buyQty * sellMultiplier,
       net_profit: netProfit,
       profit_margin: profitMargin,
@@ -201,7 +198,7 @@ const ManualArbitrage: React.FC = () => {
               }}
               sx={{ mt: { xs: 2, sm: 0 } }}
             >
-              <SwapHorizIcon fontSize="large" />
+              {/* <SwapHorizIcon fontSize="large" /> */}
             </IconButton>
           </Grid>
           <Grid item xs={12} sm={4} md={3}>
@@ -428,8 +425,8 @@ const ManualArbitrage: React.FC = () => {
                             />
                           </TableCell>
                           <TableCell align="right">
-                            {calc.unit_sell_price !== undefined
-                              ? Math.round(calc.unit_sell_price).toLocaleString(
+                            {calc.sell_price !== undefined
+                              ? Math.round(calc.sell_price).toLocaleString(
                                   "pt-BR"
                                 )
                               : 0}{" "}
@@ -448,20 +445,19 @@ const ManualArbitrage: React.FC = () => {
                             align="right"
                             style={{
                               color:
-                                calc.buy_price === 0 ||
-                                calc.unit_sell_price === 0
+                                calc.buy_price === 0 || calc.sell_price === 0
                                   ? "#aaa"
                                   : calc.net_profit >= 0
                                   ? "#4caf50"
                                   : "#f44336",
                             }}
                           >
-                            {calc.buy_price === 0 || calc.unit_sell_price === 0
+                            {calc.buy_price === 0 || calc.sell_price === 0
                               ? "N/D"
                               : Math.round(calc.net_profit).toLocaleString(
                                   "pt-BR"
                                 ) + " "}
-                            {calc.buy_price === 0 || calc.unit_sell_price === 0
+                            {calc.buy_price === 0 || calc.sell_price === 0
                               ? null
                               : silverIcon}
                           </TableCell>
@@ -469,15 +465,14 @@ const ManualArbitrage: React.FC = () => {
                             align="right"
                             style={{
                               color:
-                                calc.buy_price === 0 ||
-                                calc.unit_sell_price === 0
+                                calc.buy_price === 0 || calc.sell_price === 0
                                   ? "#aaa"
                                   : calc.profit_margin >= 0
                                   ? "#4caf50"
                                   : "#f44336",
                             }}
                           >
-                            {calc.buy_price === 0 || calc.unit_sell_price === 0
+                            {calc.buy_price === 0 || calc.sell_price === 0
                               ? "N/D"
                               : calc.profit_margin?.toFixed(2) + "%"}
                           </TableCell>
@@ -618,10 +613,8 @@ const ManualArbitrage: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell align="right">
-                        {calc.unit_sell_price !== undefined
-                          ? Math.round(calc.unit_sell_price).toLocaleString(
-                              "pt-BR"
-                            )
+                        {calc.sell_price !== undefined
+                          ? Math.round(calc.sell_price).toLocaleString("pt-BR")
                           : 0}{" "}
                         {silverIcon}
                       </TableCell>
@@ -638,19 +631,19 @@ const ManualArbitrage: React.FC = () => {
                         align="right"
                         style={{
                           color:
-                            calc.buy_price === 0 || calc.unit_sell_price === 0
+                            calc.buy_price === 0 || calc.sell_price === 0
                               ? "#aaa"
                               : calc.net_profit >= 0
                               ? "#4caf50"
                               : "#f44336",
                         }}
                       >
-                        {calc.buy_price === 0 || calc.unit_sell_price === 0
+                        {calc.buy_price === 0 || calc.sell_price === 0
                           ? "N/D"
                           : Math.round(calc.net_profit).toLocaleString(
                               "pt-BR"
                             ) + " "}
-                        {calc.buy_price === 0 || calc.unit_sell_price === 0
+                        {calc.buy_price === 0 || calc.sell_price === 0
                           ? null
                           : silverIcon}
                       </TableCell>
@@ -658,14 +651,14 @@ const ManualArbitrage: React.FC = () => {
                         align="right"
                         style={{
                           color:
-                            calc.buy_price === 0 || calc.unit_sell_price === 0
+                            calc.buy_price === 0 || calc.sell_price === 0
                               ? "#aaa"
                               : calc.profit_margin >= 0
                               ? "#4caf50"
                               : "#f44336",
                         }}
                       >
-                        {calc.buy_price === 0 || calc.unit_sell_price === 0
+                        {calc.buy_price === 0 || calc.sell_price === 0
                           ? "N/D"
                           : calc.profit_margin?.toFixed(2) + "%"}
                       </TableCell>
