@@ -1,28 +1,28 @@
--- Script para inserir dados de exemplo
--- Execute no PostgreSQL para testar o sistema
+-- CIDADES
+INSERT INTO cities (id, name, code) VALUES
+  (1, 'Bridgewatch', 'BRIDGEWATCH'),
+  (2, 'Martlock', 'MARTLOCK');
 
--- Inserir dados de exemplo na tabela market_prices
-INSERT INTO market_prices (item_type_id, city_id, quality, sell_price_min, sell_price_max, buy_price_max) VALUES
-('T4_BAG', 1, 1, 1000, 1200, 800),
-('T4_BAG', 2, 1, 1500, 1800, 1200),
-('T5_BAG', 1, 1, 2000, 2500, 1800),
-('T5_BAG', 2, 1, 3000, 3500, 2500),
-('T6_BAG', 1, 1, 4000, 4500, 3500),
-('T6_BAG', 2, 1, 5000, 5500, 4500),
-('T7_BAG', 1, 1, 8000, 8500, 7000),
-('T7_BAG', 2, 1, 10000, 11000, 9000),
-('T8_BAG', 1, 1, 15000, 16000, 14000),
-('T8_BAG', 2, 1, 20000, 22000, 18000);
+-- INGREDIENTES DE ALQUIMIA
+INSERT INTO alchemy_ingredients (id, name, tier, quality, transmutation_result) VALUES
+  (1, 'T3_RESOURCE_SHADOW', 3, 'Normal', NULL),
+  (2, 'T5_RESOURCE_SHADOW', 5, 'Normal', NULL),
+  (3, 'T7_RESOURCE_SHADOW', 7, 'Normal', NULL);
 
--- Inserir dados de exemplo na tabela price_history
-INSERT INTO price_history (item_type_id, city_id, quality, price) VALUES
-('T4_BAG', 1, 1, 1100),
-('T4_BAG', 2, 1, 1650),
-('T5_BAG', 1, 1, 2250),
-('T5_BAG', 2, 1, 3250),
-('T6_BAG', 1, 1, 4250),
-('T6_BAG', 2, 1, 5250),
-('T7_BAG', 1, 1, 8250),
-('T7_BAG', 2, 1, 10500),
-('T8_BAG', 1, 1, 15500),
-('T8_BAG', 2, 1, 21000); 
+-- PREÇOS DE MERCADO
+INSERT INTO market_prices (item_type_id, city_id, quality, sell_price_min, sell_price_max, buy_price_max)
+VALUES
+  ('T3_RESOURCE_SHADOW', 1, 1, 1000, 1200, 1100),
+  ('T5_RESOURCE_SHADOW', 1, 1, 3000, 3500, 3200),
+  ('T7_RESOURCE_SHADOW', 1, 1, 7000, 7500, 7200),
+  ('T3_RESOURCE_SHADOW', 2, 1, 1100, 1300, 1200),
+  ('T5_RESOURCE_SHADOW', 2, 1, 3200, 3700, 3400),
+  ('T7_RESOURCE_SHADOW', 2, 1, 7200, 7700, 7400);
+
+-- OPORTUNIDADES DE ARBITRAGEM
+INSERT INTO arbitrage_opportunities (
+  id, source_ingredient_id, target_ingredient_id, buy_city_id, sell_city_id,
+  buy_price, sell_price, quantity_multiplier, gross_profit, net_profit, profit_margin, calculated_at
+) VALUES
+  ('1', 2, 1, 1, 2, 3000, 1200, 2, 400, 300, 10, NOW()),
+  ('2', 3, 2, 2, 1, 7200, 3500, 2, 800, 600, 8, NOW()); 

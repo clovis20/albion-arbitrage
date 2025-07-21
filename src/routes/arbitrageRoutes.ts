@@ -34,6 +34,7 @@ export default function createArbitrageRoutes(
 
   // Buscar top oportunidades de arbitragem
   router.get("/top", async (req: Request, res: Response) => {
+    console.log(`[ROUTE] /api/arbitrage/top chamada por ${req.ip}`)
     try {
       const limit = parseInt(req.query.limit as string) || 200
       const opportunities = await db.getTopArbitrageOpportunities(limit)
@@ -103,6 +104,7 @@ export default function createArbitrageRoutes(
 
   // Simulação manual de arbitragem
   router.get("/manual-simulate", async (req: Request, res: Response) => {
+    console.log(`[ROUTE] /api/arbitrage/manual-simulate chamada por ${req.ip}`)
     try {
       const { buy_city, sell_city, item_base } = req.query
       if (!buy_city || !sell_city) {

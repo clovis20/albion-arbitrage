@@ -68,6 +68,12 @@ class App {
     )
     this.app.use(helmet())
     this.app.use(express.json()) // Para parsear JSON no corpo das requisições
+    this.app.use((req, res, next) => {
+      console.log(
+        `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`
+      )
+      next()
+    })
   }
 
   private setupRoutes() {
